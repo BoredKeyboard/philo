@@ -6,106 +6,33 @@
 /*   By: mforstho <mforstho@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/10/10 11:35:49 by mforstho      #+#    #+#                 */
-/*   Updated: 2022/10/13 16:16:35 by mforstho      ########   odam.nl         */
+/*   Updated: 2022/10/18 17:56:17 by mforstho      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
-bool	init_arguments(t_data *data, int argc, char *argv[])
+void	gettime(size_t *dst)
 {
-	if (ft_atoi(argv[1], &data->n_philos) == false
-		|| ft_atoi(argv[2], &data->t_to_die) == false
-		|| ft_atoi(argv[3], &data->t_to_eat) == false
-		|| ft_atoi(argv[4], &data->t_to_sleep) == false)
-		return (false);
-	if (argc == 6)
-	{
-		if (ft_atoi(argv[5], &data->t_must_eat) == false)
-			return (false);
-	}
-	data->fork_test = true;
-	data->current_philo = 0;
-	data->forks = malloc(sizeof(pthread_mutex_t) * data->n_philos);
-	if (data->forks == NULL)
-		return (false);
-	return (true);
+	struct timeval	tval;
+
+	gettimeofday(&tval, NULL);
+	*dst = (tval.tv_sec * 1000) + (tval.tv_usec / 1000);
 }
 
-void	init_forks(t_data *data, t_philo *philo)
+void	print_message(t_philo *philo, const char *msg)
 {
-	int	i;
-
-	i = 0;
-	while (i < data->n_philos)
+	pthread_mutex_lock(&philo->data->deathcheck);
+	if (philo->data->alive != true)
 	{
-		pthread_mutex_init(&data->forks[i], NULL);
-		i++;
+		pthread_mutex_unlock(&philo->data->deathcheck);
+		return ;
 	}
-	i = 0;
-	while (i < data->n_philos)
-	{
-		if ((i + 1) == data->n_philos)
-		{
-			philo[i].fork_left = &data->forks[i];
-			philo[i].fork_right = &data->forks[0];
-		}
-		else
-		{
-			philo[i].fork_left = &data->forks[i];
-			philo[i].fork_right = &data->forks[i + 1];
-		}
-		i++;
-	}
-}
-
-void	init_philos(t_data *data, t_philo *philo)
-{
-	int	i;
-
-	i = 0;
-	while (i < data->n_philos)
-	{
-		philo[i].data = data;
-		philo[i].philo_nbr = i + 1;
-		i++;
-	}
-}
-
-void	philo_even(t_philo *philo)
-{
-	pthread_mutex_lock(philo->fork_right);
-	pthread_mutex_lock(philo->fork_left);
+	pthread_mutex_unlock(&philo->data->deathcheck);
 	pthread_mutex_lock(&philo->data->printflock);
-	printf("Philo %d started eating\n", philo->philo_nbr);
-	printf("Philo %d is done eating\n", philo->philo_nbr);
+	gettime(&philo->t_print);
+	printf("%zu %d %s\n", (philo->t_print - philo->data->t_start), philo->philo_nbr, msg);
 	pthread_mutex_unlock(&philo->data->printflock);
-	pthread_mutex_unlock(philo->fork_left);
-	pthread_mutex_unlock(philo->fork_right);
-}
-
-void	philo_uneven(t_philo *philo)
-{
-	pthread_mutex_lock(philo->fork_left);
-	pthread_mutex_lock(philo->fork_right);
-	pthread_mutex_lock(&philo->data->printflock);
-	printf("Philo %d started eating\n", philo->philo_nbr);
-	printf("Philo %d is done eating\n", philo->philo_nbr);
-	pthread_mutex_unlock(&philo->data->printflock);
-	pthread_mutex_unlock(philo->fork_right);
-	pthread_mutex_unlock(philo->fork_left);
-}
-
-void	*philo_thread(void *my_philo)
-{
-	t_philo	*philo;
-
-	philo = (t_philo *)my_philo;
-	if (philo->philo_nbr % 2 == 0)
-		philo_even(philo);
-	else
-		philo_uneven(philo);
-	return (NULL);
 }
 
 void	destroy_forks(t_data *data)
@@ -119,6 +46,89 @@ void	destroy_forks(t_data *data)
 		i++;
 	}
 	free(data->forks);
+}
+
+bool	is_alive(t_data *data)
+{
+	bool	ans;
+
+	pthread_mutex_lock(&data->deathcheck);
+	ans = data->alive;
+	pthread_mutex_unlock(&data->deathcheck);
+	return (ans);
+}
+
+void	usleep_death(t_philo *philo, int sleep)
+{
+	size_t	begin;
+	size_t	current;
+
+	gettime(&begin);
+	gettime(&current);
+	while (current - begin < (size_t)sleep)
+	{
+		if (is_alive(philo->data) != true)
+			break ;
+		if ((current - philo->t_meal)
+			>= (size_t)philo->data->t_to_die)
+		{
+			print_message(philo, "died");
+			pthread_mutex_lock(&philo->data->deathcheck);
+			philo->data->alive = false;
+			pthread_mutex_unlock(&philo->data->deathcheck);
+			break ;
+		}
+		usleep(500);
+		gettime(&current);
+	}
+}
+
+void	philofunc(t_philo *philo, pthread_mutex_t *first, pthread_mutex_t *second)
+{
+	while (true)
+	{
+		pthread_mutex_lock(first);
+		print_message(philo, "has taken a fork");
+		pthread_mutex_lock(second);
+		print_message(philo, "has taken a fork");
+		if (is_alive(philo->data) != true)
+		{
+			pthread_mutex_unlock(second);
+			pthread_mutex_unlock(first);
+			break ;
+		}
+		gettime(&philo->t_meal);
+		print_message(philo, "is eating");
+		usleep_death(philo, philo->data->t_to_eat);
+		pthread_mutex_unlock(second);
+		pthread_mutex_unlock(first);
+		if (is_alive(philo->data) != true)
+			break ;
+		philo->meals_eaten++;
+		if (philo->data->t_must_eat != -1
+			&& philo->meals_eaten == philo->data->t_must_eat)
+		{
+			print_message(philo, "finished meals");
+			break ;
+		}
+		print_message(philo, "is sleeping");
+		usleep_death(philo, philo->data->t_to_sleep);
+		if (is_alive(philo->data) != true)
+			break ;
+		print_message(philo, "is thinking");
+	}
+}
+
+void	*philo_thread(void *my_philo)
+{
+	t_philo	*philo;
+
+	philo = (t_philo *)my_philo;
+	if (philo->philo_nbr % 2 == 0)
+		philofunc(philo, philo->fork_left, philo->fork_right);
+	else
+		philofunc(philo, philo->fork_right, philo->fork_left);
+	return (NULL);
 }
 
 void	leakfunc(void)
@@ -136,24 +146,46 @@ int	main(int argc, char *argv[])
 	// atexit(leakfunc);
 	if (argc < 5 || argc > 6)
 	{
-		printf("Incorrect argumentation\n");
+		ft_putendl_fd("Incorrect argumentation", STDERR_FILENO);
 		return (EXIT_FAILURE);
 	}
+	gettime(&data.t_start);
 	if (init_arguments(&data, argc, argv) == false)
+	{
+		ft_putendl_fd("Chars or negative numbers are not allowed", STDERR_FILENO);
 		return (EXIT_FAILURE);
+	}
+	if (data.n_philos == 1)
+	{
+		gettime(&data.t_current);
+		printf("%zu 1 has taken a fork\n", (data.t_current - data.t_start));
+		usleep(data.t_to_die * 1000);
+		gettime(&data.t_current);
+		printf("%zu 1 died\n", (data.t_current - data.t_start));
+		return (EXIT_SUCCESS);
+	}
 	thread_id = malloc(sizeof(pthread_t) * data.n_philos);
 	philo = malloc(sizeof(t_philo) * data.n_philos);
 	if (thread_id == NULL || philo == NULL)
+	{
+		free(thread_id);
+		free(philo);
+		ft_putendl_fd("Test", STDERR_FILENO);
 		return (EXIT_SUCCESS);	//hiervoor nog freeen
-	printf("Test\n");
+	}
 	init_philos(&data, philo);
-	printf("Test1\n");
 	init_forks(&data, philo);
 	pthread_mutex_init(&data.printflock, NULL);
+	pthread_mutex_init(&data.deathcheck, NULL);
 	i = 0;
 	while (i < data.n_philos)
 	{
-		pthread_create(&thread_id[i], NULL, philo_thread, &philo[i]);
+		if (pthread_create(&thread_id[i], NULL, philo_thread, &philo[i])
+			!= SYS_OK)
+		{
+			data.n_philos = i;
+			break ;
+		}
 		i++;
 	}
 	i = 0;
@@ -162,69 +194,10 @@ int	main(int argc, char *argv[])
 		pthread_join(thread_id[i], NULL);
 		i++;
 	}
-	pthread_mutex_destroy(&data.printflock);
-	destroy_forks(&data);
 	free(thread_id);
 	free(philo);
+	pthread_mutex_destroy(&data.deathcheck);
+	pthread_mutex_destroy(&data.printflock);
+	destroy_forks(&data);
 	return (EXIT_SUCCESS);
 }
-
-/*
-
-void	*test_thread(void *my_data)
-{
-	t_data	*data;
-
-	data = (t_data *)my_data;
-	pthread_mutex_lock(&data->lock);
-	if (data->fork_test == true)
-	{
-		printf("True, setting to false\n");
-		data->fork_test = false;
-	}
-	else
-	{
-		printf("False, setting to true\n");
-		data->fork_test = true;
-	}
-	pthread_mutex_unlock(&data->lock);
-	return (NULL);
-}
-
-void	free_array(void *arr)
-{
-	int	i;
-
-	if (arr == NULL)
-		return ;
-	i = 0;
-	while (arr[i] != NULL)
-	{
-		free(arr[i]);
-		i++;
-	}
-	free(arr);
-}
-
-*/
-
-/*
-void	*test_thread(void *my_philo)
-{
-	t_philo	*philo;
-
-	philo = (t_philo *)my_philo;
-	pthread_mutex_lock(&philo->data->printflock);
-	pthread_mutex_lock(philo->fork_right);
-	usleep(1000);		//AAAAAAAA
-	pthread_mutex_lock(philo->fork_left);
-
-	printf("Philo %d started eating\n", philo->philo_nbr);
-	printf("Philo %d is done eating\n", philo->philo_nbr);
-
-	pthread_mutex_unlock(philo->fork_right);
-	pthread_mutex_unlock(philo->fork_left);
-	pthread_mutex_unlock(&philo->data->printflock);
-	return (NULL);
-}
-*/

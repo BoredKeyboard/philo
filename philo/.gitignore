@@ -1,8 +1,8 @@
 *
+src/Notes.md
 !*/
 !*.c
 !*.h
 !Makefile
 !*.mk
-tmp/
 !.gitignore
