@@ -6,7 +6,7 @@
 /*   By: mforstho <mforstho@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/10/18 13:48:02 by mforstho      #+#    #+#                 */
-/*   Updated: 2022/10/18 18:01:03 by mforstho      ########   odam.nl         */
+/*   Updated: 2022/10/19 14:36:05 by mforstho      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,4 +79,12 @@ void	init_philos(t_data *data, t_philo *philo)
 		gettime(&philo[i].t_meal);
 		i++;
 	}
+}
+
+void	initialize_all(t_data *data, t_philo *philo)
+{
+	init_philos(data, philo);
+	init_forks(data, philo);
+	pthread_mutex_init(&data->printflock, NULL);
+	pthread_mutex_init(&data->deathcheck, NULL);
 }

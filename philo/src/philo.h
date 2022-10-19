@@ -6,7 +6,7 @@
 /*   By: mforstho <mforstho@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/10/10 11:14:53 by mforstho      #+#    #+#                 */
-/*   Updated: 2022/10/18 17:48:16 by mforstho      ########   odam.nl         */
+/*   Updated: 2022/10/19 14:36:14 by mforstho      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,6 +61,18 @@ ssize_t	ft_putendl_fd(char *s, int fd);
 bool	init_arguments(t_data *data, int argc, char *argv[]);
 void	init_forks(t_data *data, t_philo *philo);
 void	init_philos(t_data *data, t_philo *philo);
+void	initialize_all(t_data *data, t_philo *philo);
+
+void	destroy_forks(t_data *data);
+void	gettime(size_t *dst);
+void	print_message(t_philo *philo, const char *msg);
+bool	is_alive(t_data *data);
+void	usleep_death(t_philo *philo, int sleep);
+
+void	print_message(t_philo *philo, const char *msg);
+void	print_message_unchecked(t_philo *philo, const char *msg);
+
+void	*philo_thread(void *my_philo);
 
 void	gettime(size_t *dst);
 

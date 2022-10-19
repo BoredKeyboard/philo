@@ -6,7 +6,7 @@
 #    By: mforstho <mforstho@student.codam.nl>         +#+                      #
 #                                                    +#+                       #
 #    Created: 2022/10/10 11:12:37 by mforstho      #+#    #+#                  #
-#    Updated: 2022/10/18 17:53:10 by mforstho      ########   odam.nl          #
+#    Updated: 2022/10/19 14:34:40 by mforstho      ########   odam.nl          #
 #                                                                              #
 # **************************************************************************** #
 
@@ -19,7 +19,10 @@ SOURCES :=				\
 	src/ft_isdigit.c	\
 	src/ft_isspace.c	\
 	src/ft_putendl_fd.c	\
+	src/generic.c		\
 	src/initialization.c\
+	src/print_message.c	\
+	src/threads.c		\
 	src/philo.c
 
 HEADERS := src/philo.h
