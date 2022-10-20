@@ -6,7 +6,7 @@
 /*   By: mforstho <mforstho@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/10/10 11:35:49 by mforstho      #+#    #+#                 */
-/*   Updated: 2022/10/19 14:35:58 by mforstho      ########   odam.nl         */
+/*   Updated: 2022/10/20 15:58:49 by mforstho      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,31 +34,35 @@ int	end_all(t_data *data, pthread_t *thread_id, t_philo *philo)
 	free(philo);
 	pthread_mutex_destroy(&data->deathcheck);
 	pthread_mutex_destroy(&data->printflock);
-	destroy_forks(data);
+	destroy_forks(data, data->n_philos);
 	return (EXIT_SUCCESS);
 }
 
-void	create_philos(t_data *data, pthread_t *thread_id, t_philo *philo)
+bool	create_philos(t_data *data, pthread_t *thread_id, t_philo *philo)
 {
 	int	i;
 
 	i = 0;
+	data->start = false;
 	while (i < data->n_philos)
 	{
 		if (pthread_create(&thread_id[i], NULL, philo_thread, &philo[i])
 			!= SYS_OK)
 		{
 			data->n_philos = i;
-			break ;
+			data->alive = false;
+			return (false);
 		}
 		i++;
 	}
+	data->start = true;
 	i = 0;
 	while (i < data->n_philos)
 	{
 		pthread_join(thread_id[i], NULL);
 		i++;
 	}
+	return (true);
 }
 
 int	main(int argc, char *argv[])
@@ -72,7 +76,6 @@ int	main(int argc, char *argv[])
 		ft_putendl_fd("Incorrect argumentation", STDERR_FILENO);
 		return (EXIT_FAILURE);
 	}
-	gettime(&data.t_start);
 	if (init_arguments(&data, argc, argv) == false)
 		return (return_with_msg("Error: args", STDERR_FILENO, EXIT_FAILURE));
 	if (data.n_philos == 1)
@@ -85,7 +88,8 @@ int	main(int argc, char *argv[])
 		free(philo);
 		return (return_with_msg("Error: malloc", STDERR_FILENO, EXIT_SUCCESS));
 	}
-	initialize_all(&data, philo);
-	create_philos(&data, thread_id, philo);
+	if (initialize_all(&data, philo) != true
+		|| create_philos(&data, thread_id, philo) != true)
+		return (end_all(&data, thread_id, philo));
 	return (end_all(&data, thread_id, philo));
 }

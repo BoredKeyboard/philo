@@ -6,7 +6,7 @@
 /*   By: mforstho <mforstho@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/10/19 12:41:25 by mforstho      #+#    #+#                 */
-/*   Updated: 2022/10/19 14:22:39 by mforstho      ########   odam.nl         */
+/*   Updated: 2022/10/20 15:49:23 by mforstho      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,6 +63,21 @@ void	*philo_thread(void *my_philo)
 	t_philo	*philo;
 
 	philo = (t_philo *)my_philo;
+	while (true)
+	{
+		pthread_mutex_lock(&philo->data->deathcheck);
+		if (philo->data->alive == false)
+		{
+			pthread_mutex_unlock(&philo->data->deathcheck);
+			return (NULL);
+		}
+		if (philo->data->start == true)
+		{
+			pthread_mutex_unlock(&philo->data->deathcheck);
+			break ;
+		}
+		pthread_mutex_unlock(&philo->data->deathcheck);
+	}
 	if (philo->philo_nbr % 2 == 0)
 		philofunc(philo, philo->fork_left, philo->fork_right);
 	else

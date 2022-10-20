@@ -6,7 +6,7 @@
 /*   By: mforstho <mforstho@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/10/10 11:14:53 by mforstho      #+#    #+#                 */
-/*   Updated: 2022/10/19 14:36:14 by mforstho      ########   odam.nl         */
+/*   Updated: 2022/10/20 14:34:41 by mforstho      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,6 @@ typedef struct s_data
 	int				t_to_eat;
 	int				t_to_sleep;
 	int				t_must_eat;
-	bool			fork_test;
 	pthread_mutex_t	printflock;
 	pthread_mutex_t	deathcheck;
 	pthread_mutex_t	*forks;
@@ -38,6 +37,7 @@ typedef struct s_data
 	size_t			t_start;
 	size_t			t_current;
 	bool			alive;
+	bool			start;
 }	t_data;
 
 typedef struct s_philo
@@ -59,11 +59,11 @@ int		ft_isspace(const char c);
 ssize_t	ft_putendl_fd(char *s, int fd);
 
 bool	init_arguments(t_data *data, int argc, char *argv[]);
-void	init_forks(t_data *data, t_philo *philo);
+bool	init_forks(t_data *data, t_philo *philo);
 void	init_philos(t_data *data, t_philo *philo);
-void	initialize_all(t_data *data, t_philo *philo);
+bool	initialize_all(t_data *data, t_philo *philo);
 
-void	destroy_forks(t_data *data);
+void	destroy_forks(t_data *data, int amount);
 void	gettime(size_t *dst);
 void	print_message(t_philo *philo, const char *msg);
 bool	is_alive(t_data *data);

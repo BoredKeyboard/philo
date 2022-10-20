@@ -6,18 +6,18 @@
 /*   By: mforstho <mforstho@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/10/19 12:47:19 by mforstho      #+#    #+#                 */
-/*   Updated: 2022/10/19 14:33:51 by mforstho      ########   odam.nl         */
+/*   Updated: 2022/10/20 13:42:28 by mforstho      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
-void	destroy_forks(t_data *data)
+void	destroy_forks(t_data *data, int amount)
 {
 	int	i;
 
 	i = 0;
-	while (i < data->n_philos)
+	while (i < amount)
 	{
 		pthread_mutex_destroy(&data->forks[i]);
 		i++;
