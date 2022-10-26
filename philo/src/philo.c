@@ -6,7 +6,7 @@
 /*   By: mforstho <mforstho@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/10/10 11:35:49 by mforstho      #+#    #+#                 */
-/*   Updated: 2022/10/20 15:58:49 by mforstho      ########   odam.nl         */
+/*   Updated: 2022/10/26 15:03:22 by mforstho      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,47 +28,9 @@ int	one_philo(t_data *data)
 	return (EXIT_SUCCESS);
 }
 
-int	end_all(t_data *data, pthread_t *thread_id, t_philo *philo)
-{
-	free(thread_id);
-	free(philo);
-	pthread_mutex_destroy(&data->deathcheck);
-	pthread_mutex_destroy(&data->printflock);
-	destroy_forks(data, data->n_philos);
-	return (EXIT_SUCCESS);
-}
-
-bool	create_philos(t_data *data, pthread_t *thread_id, t_philo *philo)
-{
-	int	i;
-
-	i = 0;
-	data->start = false;
-	while (i < data->n_philos)
-	{
-		if (pthread_create(&thread_id[i], NULL, philo_thread, &philo[i])
-			!= SYS_OK)
-		{
-			data->n_philos = i;
-			data->alive = false;
-			return (false);
-		}
-		i++;
-	}
-	data->start = true;
-	i = 0;
-	while (i < data->n_philos)
-	{
-		pthread_join(thread_id[i], NULL);
-		i++;
-	}
-	return (true);
-}
-
 int	main(int argc, char *argv[])
 {
 	t_data			data;
-	pthread_t		*thread_id;
 	t_philo			*philo;
 
 	if (argc < 5 || argc > 6)
@@ -80,16 +42,15 @@ int	main(int argc, char *argv[])
 		return (return_with_msg("Error: args", STDERR_FILENO, EXIT_FAILURE));
 	if (data.n_philos == 1)
 		return (one_philo(&data));
-	thread_id = malloc(sizeof(pthread_t) * data.n_philos);
 	philo = malloc(sizeof(t_philo) * data.n_philos);
-	if (thread_id == NULL || philo == NULL)
+	if (philo == NULL)
 	{
-		free(thread_id);
 		free(philo);
+		free(data.forks);
 		return (return_with_msg("Error: malloc", STDERR_FILENO, EXIT_SUCCESS));
 	}
 	if (initialize_all(&data, philo) != true
-		|| create_philos(&data, thread_id, philo) != true)
-		return (end_all(&data, thread_id, philo));
-	return (end_all(&data, thread_id, philo));
+		|| philos_setup(&data, philo) != true)
+		return (end_all(&data, philo));
+	return (end_all(&data, philo));
 }

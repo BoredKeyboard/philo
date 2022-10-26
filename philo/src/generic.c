@@ -6,7 +6,7 @@
 /*   By: mforstho <mforstho@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/10/19 12:47:19 by mforstho      #+#    #+#                 */
-/*   Updated: 2022/10/20 13:42:28 by mforstho      ########   odam.nl         */
+/*   Updated: 2022/10/26 13:33:16 by mforstho      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,6 +58,38 @@ void	usleep_death(t_philo *philo, int sleep)
 			pthread_mutex_unlock(&philo->data->deathcheck);
 			break ;
 		}
+		pthread_mutex_unlock(&philo->data->deathcheck);
+		usleep(500);
+		gettime(&current);
+	}
+}
+
+int	end_all(t_data *data, t_philo *philo)
+{
+	free(philo);
+	pthread_mutex_destroy(&data->deathcheck);
+	pthread_mutex_destroy(&data->printflock);
+	pthread_mutex_destroy(&data->meal_lock);
+	destroy_forks(data, data->n_philos);
+	return (EXIT_SUCCESS);
+}
+
+/*
+void	usleep_death(t_philo *philo, int sleep)
+{
+	size_t	begin;
+	size_t	current;
+
+	gettime(&begin);
+	gettime(&current);
+	while (current - begin < (size_t)sleep)
+	{
+		pthread_mutex_lock(&philo->data->deathcheck);
+		if (philo->data->alive != true)
+		{
+			pthread_mutex_unlock(&philo->data->deathcheck);
+			break ;
+		}
 		if ((current - philo->t_meal)
 			>= (size_t)philo->data->t_to_die)
 		{
@@ -71,3 +103,4 @@ void	usleep_death(t_philo *philo, int sleep)
 		gettime(&current);
 	}
 }
+*/

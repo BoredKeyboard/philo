@@ -6,7 +6,7 @@
 /*   By: mforstho <mforstho@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/10/18 13:48:02 by mforstho      #+#    #+#                 */
-/*   Updated: 2022/10/20 16:01:36 by mforstho      ########   odam.nl         */
+/*   Updated: 2022/10/26 14:09:59 by mforstho      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,6 @@
 
 bool	init_arguments(t_data *data, int argc, char *argv[])
 {
-	gettime(&data->t_start);
 	if (ft_atoi(argv[1], &data->n_philos) == false
 		|| ft_atoi(argv[2], &data->t_to_die) == false
 		|| data->t_to_die < 0
@@ -25,14 +24,15 @@ bool	init_arguments(t_data *data, int argc, char *argv[])
 		return (false);
 	if (argc == 6)
 	{
-		if (ft_atoi(argv[5], &data->t_must_eat) == false
-			|| data->t_must_eat < 0)
+		if (ft_atoi(argv[5], &data->meals) == false
+			|| data->meals < 0)
 			return (false);
 	}
 	else
-		data->t_must_eat = -1;
+		data->meals = -1;
 	data->current_philo = 0;
 	data->alive = true;
+	data->philos_done = 0;
 	data->forks = malloc(sizeof(pthread_mutex_t) * data->n_philos);
 	if (data->forks == NULL)
 		return (false);
@@ -85,8 +85,7 @@ void	init_philos(t_data *data, t_philo *philo)
 	{
 		philo[i].data = data;
 		philo[i].philo_nbr = i + 1;
-		philo[i].meals_eaten = 0;
-		gettime(&philo[i].t_meal);
+		philo[i].eaten = 0;
 		i++;
 	}
 }
@@ -99,6 +98,8 @@ bool	initialize_all(t_data *data, t_philo *philo)
 	if (pthread_mutex_init(&data->printflock, NULL) != SYS_OK)
 		return (false);
 	if (pthread_mutex_init(&data->deathcheck, NULL) != SYS_OK)
+		return (false);
+	if (pthread_mutex_init(&data->meal_lock, NULL) != SYS_OK)
 		return (false);
 	return (true);
 }

@@ -6,7 +6,7 @@
 /*   By: mforstho <mforstho@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/10/19 12:41:25 by mforstho      #+#    #+#                 */
-/*   Updated: 2022/10/20 15:49:23 by mforstho      ########   odam.nl         */
+/*   Updated: 2022/10/26 14:49:18 by mforstho      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,23 +34,25 @@ void	print_msg_sleep(t_philo *philo, char *msg, int sleep)
 
 void	philofunc(t_philo *philo, pthread_mutex_t *one, pthread_mutex_t *two)
 {
+	if (philo->philo_nbr % 2 == 0)
+		usleep_death(philo, (philo->data->t_to_eat / 2));
 	while (true)
 	{
 		lock_forks(philo, one, two);
 		if (is_alive(philo->data) != true)
-		{
-			unlock_forks(one, two);
-			break ;
-		}
+			return (unlock_forks(one, two));
 		gettime(&philo->t_meal);
 		print_msg_sleep(philo, "is eating", philo->data->t_to_eat);
 		unlock_forks(one, two);
 		if (is_alive(philo->data) != true)
 			break ;
-		philo->meals_eaten++;
-		if (philo->data->t_must_eat != -1
-			&& philo->meals_eaten == philo->data->t_must_eat)
-			break ;
+		philo->eaten++;
+		if (philo->data->meals != -1 && philo->eaten == philo->data->meals)
+		{
+			pthread_mutex_lock(&philo->data->meal_lock);
+			philo->data->philos_done++;
+			pthread_mutex_unlock(&philo->data->meal_lock);
+		}
 		print_msg_sleep(philo, "is sleeping", philo->data->t_to_sleep);
 		if (is_alive(philo->data) != true)
 			break ;
@@ -84,3 +86,31 @@ void	*philo_thread(void *my_philo)
 		philofunc(philo, philo->fork_right, philo->fork_left);
 	return (NULL);
 }
+
+/*
+void	philofunc(t_philo *philo, pthread_mutex_t *one, pthread_mutex_t *two)
+{
+	while (true)
+	{
+		lock_forks(philo, one, two);
+		if (is_alive(philo->data) != true)
+		{
+			unlock_forks(one, two);
+			break ;
+		}
+		gettime(&philo->t_meal);
+		print_msg_sleep(philo, "is eating", philo->data->t_to_eat);
+		unlock_forks(one, two);
+		if (is_alive(philo->data) != true)
+			break ;
+		philo->eaten++;
+		if (philo->data->meals != -1
+			&& philo->eaten == philo->data->meals)
+			break ;
+		print_msg_sleep(philo, "is sleeping", philo->data->t_to_sleep);
+		if (is_alive(philo->data) != true)
+			break ;
+		print_message(philo, "is thinking");
+	}
+}
+*/
