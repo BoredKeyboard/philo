@@ -6,7 +6,7 @@
 /*   By: mforstho <mforstho@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/10/19 12:41:25 by mforstho      #+#    #+#                 */
-/*   Updated: 2022/10/27 12:36:33 by mforstho      ########   odam.nl         */
+/*   Updated: 2022/10/27 15:22:02 by mforstho      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,31 +88,3 @@ void	*philo_thread(void *my_philo)
 		philofunc(philo, philo->fork_right, philo->fork_left);
 	return (NULL);
 }
-
-/*
-void	philofunc(t_philo *philo, pthread_mutex_t *one, pthread_mutex_t *two)
-{
-	while (true)
-	{
-		lock_forks(philo, one, two);
-		if (is_alive(philo->data) != true)
-		{
-			unlock_forks(one, two);
-			break ;
-		}
-		gettime(&philo->t_meal);
-		print_msg_sleep(philo, "is eating", philo->data->t_to_eat);
-		unlock_forks(one, two);
-		if (is_alive(philo->data) != true)
-			break ;
-		philo->eaten++;
-		if (philo->data->meals != -1
-			&& philo->eaten == philo->data->meals)
-			break ;
-		print_msg_sleep(philo, "is sleeping", philo->data->t_to_sleep);
-		if (is_alive(philo->data) != true)
-			break ;
-		print_message(philo, "is thinking");
-	}
-}
-*/
