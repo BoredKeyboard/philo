@@ -6,7 +6,7 @@
 /*   By: mforstho <mforstho@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/10/10 11:14:53 by mforstho      #+#    #+#                 */
-/*   Updated: 2022/10/26 15:03:42 by mforstho      ########   odam.nl         */
+/*   Updated: 2022/10/27 12:35:39 by mforstho      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,6 +74,7 @@ int		end_all(t_data *data, t_philo *philo);
 
 void	print_message(t_philo *philo, const char *msg);
 void	print_message_unchecked(t_philo *philo, const char *msg);
+void	print_msg_sleep(t_philo *philo, char *msg, int sleep);
 
 void	*philo_thread(void *my_philo);
 

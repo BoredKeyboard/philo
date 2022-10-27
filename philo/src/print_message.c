@@ -6,7 +6,7 @@
 /*   By: mforstho <mforstho@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/10/19 14:33:36 by mforstho      #+#    #+#                 */
-/*   Updated: 2022/10/19 14:33:53 by mforstho      ########   odam.nl         */
+/*   Updated: 2022/10/27 12:35:26 by mforstho      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,4 +36,10 @@ void	print_message_unchecked(t_philo *philo, const char *msg)
 	printf("%zu %d %s\n", (philo->t_print - philo->data->t_start),
 		philo->philo_nbr, msg);
 	pthread_mutex_unlock(&philo->data->printflock);
+}
+
+void	print_msg_sleep(t_philo *philo, char *msg, int sleep)
+{
+	print_message(philo, msg);
+	usleep_death(philo, sleep);
 }

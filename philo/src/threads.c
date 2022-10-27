@@ -6,7 +6,7 @@
 /*   By: mforstho <mforstho@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/10/19 12:41:25 by mforstho      #+#    #+#                 */
-/*   Updated: 2022/10/26 14:49:18 by mforstho      ########   odam.nl         */
+/*   Updated: 2022/10/27 12:36:33 by mforstho      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,10 +26,12 @@ void	unlock_forks(pthread_mutex_t *one, pthread_mutex_t *two)
 	pthread_mutex_unlock(one);
 }
 
-void	print_msg_sleep(t_philo *philo, char *msg, int sleep)
+void	philo_think(t_philo *philo)
 {
-	print_message(philo, msg);
-	usleep_death(philo, sleep);
+	if (philo->data->n_philos % 2 == 0)
+		print_message(philo, "is thinking");
+	else
+		print_msg_sleep(philo, "is thinking", (philo->data->t_to_eat / 2));
 }
 
 void	philofunc(t_philo *philo, pthread_mutex_t *one, pthread_mutex_t *two)
@@ -56,7 +58,7 @@ void	philofunc(t_philo *philo, pthread_mutex_t *one, pthread_mutex_t *two)
 		print_msg_sleep(philo, "is sleeping", philo->data->t_to_sleep);
 		if (is_alive(philo->data) != true)
 			break ;
-		print_message(philo, "is thinking");
+		philo_think(philo);
 	}
 }
 
