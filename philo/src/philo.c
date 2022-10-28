@@ -6,7 +6,7 @@
 /*   By: mforstho <mforstho@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/10/10 11:35:49 by mforstho      #+#    #+#                 */
-/*   Updated: 2022/10/27 11:49:42 by mforstho      ########   odam.nl         */
+/*   Updated: 2022/10/28 14:33:11 by mforstho      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,16 +16,6 @@ int	return_with_msg(char *msg, int fd, int value)
 {
 	ft_putendl_fd(msg, fd);
 	return (value);
-}
-
-int	one_philo(t_data *data)
-{
-	gettime(&data->t_current);
-	printf("%zu 1 has taken a fork\n", (data->t_current - data->t_start));
-	usleep(data->t_to_die * 1000);
-	gettime(&data->t_current);
-	printf("%zu 1 died\n", (data->t_current - data->t_start));
-	return (EXIT_SUCCESS);
 }
 
 int	main(int argc, char *argv[])
@@ -40,8 +30,6 @@ int	main(int argc, char *argv[])
 	}
 	if (init_arguments(&data, argc, argv) == false)
 		return (return_with_msg("Error: args", STDERR_FILENO, EXIT_FAILURE));
-	if (data.n_philos == 1)
-		return (one_philo(&data));
 	philo = malloc(sizeof(t_philo) * data.n_philos);
 	if (philo == NULL)
 	{

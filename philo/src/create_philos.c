@@ -6,7 +6,7 @@
 /*   By: mforstho <mforstho@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/10/26 15:02:37 by mforstho      #+#    #+#                 */
-/*   Updated: 2022/10/26 15:09:40 by mforstho      ########   odam.nl         */
+/*   Updated: 2022/10/28 18:02:58 by mforstho      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,15 +20,18 @@ bool	check_death_state(t_data *data, t_philo *philo)
 	i = 0;
 	while (i < data->n_philos)
 	{
-		gettime(&current);
+		current = gettime2();
 		pthread_mutex_lock(&data->deathcheck);
+		pthread_mutex_lock(&data->eat_lock);
 		if ((current - philo[i].t_meal) >= (size_t)philo->data->t_to_die)
 		{
 			philo->data->alive = false;
-			pthread_mutex_unlock(&data->deathcheck);
 			print_message_unchecked(&philo[i], "died");
+			pthread_mutex_unlock(&data->eat_lock);
+			pthread_mutex_unlock(&data->deathcheck);
 			return (false);
 		}
+		pthread_mutex_unlock(&data->eat_lock);
 		pthread_mutex_unlock(&data->deathcheck);
 		i++;
 	}
@@ -40,14 +43,15 @@ void	check_state(t_data *data, t_philo *philo)
 	while (true)
 	{
 		pthread_mutex_lock(&data->meal_lock);
+		pthread_mutex_lock(&data->deathcheck);
 		if (data->philos_done == data->n_philos)
 		{
-			pthread_mutex_unlock(&data->meal_lock);
-			pthread_mutex_lock(&data->deathcheck);
 			data->alive = false;
 			pthread_mutex_unlock(&data->deathcheck);
+			pthread_mutex_unlock(&data->meal_lock);
 			return ;
 		}
+		pthread_mutex_unlock(&data->deathcheck);
 		pthread_mutex_unlock(&data->meal_lock);
 		if (check_death_state(data, philo) == false)
 			return ;

@@ -6,7 +6,7 @@
 /*   By: mforstho <mforstho@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/10/18 13:48:02 by mforstho      #+#    #+#                 */
-/*   Updated: 2022/10/26 14:09:59 by mforstho      ########   odam.nl         */
+/*   Updated: 2022/10/28 16:26:59 by mforstho      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,6 +86,10 @@ void	init_philos(t_data *data, t_philo *philo)
 		philo[i].data = data;
 		philo[i].philo_nbr = i + 1;
 		philo[i].eaten = 0;
+		// if ((i + 1) % 2 == 0)
+		// 	philo[i].eaten = 0;
+		// else
+		// 	philo[i].eaten = 1;
 		i++;
 	}
 }
@@ -96,6 +100,8 @@ bool	initialize_all(t_data *data, t_philo *philo)
 	if (init_forks(data, philo) != true)
 		return (false);
 	if (pthread_mutex_init(&data->printflock, NULL) != SYS_OK)
+		return (false);
+	if (pthread_mutex_init(&data->eat_lock, NULL) != SYS_OK)
 		return (false);
 	if (pthread_mutex_init(&data->deathcheck, NULL) != SYS_OK)
 		return (false);

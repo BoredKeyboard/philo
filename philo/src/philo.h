@@ -6,7 +6,7 @@
 /*   By: mforstho <mforstho@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/10/10 11:14:53 by mforstho      #+#    #+#                 */
-/*   Updated: 2022/10/27 12:35:39 by mforstho      ########   odam.nl         */
+/*   Updated: 2022/10/28 16:26:45 by mforstho      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,6 +33,7 @@ typedef struct s_data
 	pthread_mutex_t	printflock;
 	pthread_mutex_t	deathcheck;
 	pthread_mutex_t	meal_lock;
+	pthread_mutex_t	eat_lock;
 	pthread_mutex_t	*forks;
 	int				current_philo;
 	size_t			t_start;
@@ -66,20 +67,24 @@ bool	init_forks(t_data *data, t_philo *philo);
 void	init_philos(t_data *data, t_philo *philo);
 bool	initialize_all(t_data *data, t_philo *philo);
 
+void	*one_philo(t_data *data);
+
 void	destroy_forks(t_data *data, int amount);
 void	gettime(size_t *dst);
 bool	is_alive(t_data *data);
-void	usleep_death(t_philo *philo, int sleep);
+bool	usleep_death(t_philo *philo, int sleep);
 int		end_all(t_data *data, t_philo *philo);
 
-void	print_message(t_philo *philo, const char *msg);
+bool	print_message(t_philo *philo, const char *msg);
 void	print_message_unchecked(t_philo *philo, const char *msg);
-void	print_msg_sleep(t_philo *philo, char *msg, int sleep);
+bool	print_msg_sleep(t_philo *philo, char *msg, int sleep);
 
 void	*philo_thread(void *my_philo);
 
 void	gettime(size_t *dst);
 
 bool	philos_setup(t_data *data, t_philo *philo);
+
+size_t	gettime2(void);
 
 #endif
