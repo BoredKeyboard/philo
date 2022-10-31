@@ -6,7 +6,7 @@
 /*   By: mforstho <mforstho@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/10/10 11:35:49 by mforstho      #+#    #+#                 */
-/*   Updated: 2022/10/28 14:33:11 by mforstho      ########   odam.nl         */
+/*   Updated: 2022/10/31 13:33:04 by mforstho      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,26 @@ int	return_with_msg(char *msg, int fd, int value)
 {
 	ft_putendl_fd(msg, fd);
 	return (value);
+}
+
+void	*one_philo(t_philo *philo)
+{
+	gettime(&philo->data->t_current);
+	pthread_mutex_lock(philo->fork_left);
+	printf("%zu 1 has taken a fork\n",
+		(philo->data->t_current - philo->data->t_start));
+	while (true)
+	{
+		pthread_mutex_lock(&philo->data->deathcheck);
+		if (philo->data->alive == false)
+		{
+			pthread_mutex_unlock(&philo->data->deathcheck);
+			pthread_mutex_unlock(philo->fork_left);
+			break ;
+		}
+		pthread_mutex_unlock(&philo->data->deathcheck);
+	}
+	return (NULL);
 }
 
 int	main(int argc, char *argv[])

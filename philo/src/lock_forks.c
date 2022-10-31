@@ -1,23 +1,27 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        ::::::::            */
-/*   one_philo.c                                        :+:    :+:            */
+/*   lock_forks.c                                       :+:    :+:            */
 /*                                                     +:+                    */
 /*   By: mforstho <mforstho@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
-/*   Created: 2022/10/27 15:49:33 by mforstho      #+#    #+#                 */
-/*   Updated: 2022/10/27 15:53:00 by mforstho      ########   odam.nl         */
+/*   Created: 2022/10/31 15:03:17 by mforstho      #+#    #+#                 */
+/*   Updated: 2022/10/31 15:03:46 by mforstho      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
-void	*one_philo(t_data *data)
+void	lock_forks(t_philo *philo, pthread_mutex_t *one, pthread_mutex_t *two)
 {
-	gettime(&data->t_current);
-	printf("%zu 1 has taken a fork\n", (data->t_current - data->t_start));
-	usleep(data->t_to_die * 1000);
-	gettime(&data->t_current);
-	printf("%zu 1 died\n", (data->t_current - data->t_start));
-	return (NULL);
+	pthread_mutex_lock(one);
+	print_message(philo, "has taken a fork");
+	pthread_mutex_lock(two);
+	print_message(philo, "has taken a fork");
+}
+
+void	unlock_forks(pthread_mutex_t *one, pthread_mutex_t *two)
+{
+	pthread_mutex_unlock(two);
+	pthread_mutex_unlock(one);
 }

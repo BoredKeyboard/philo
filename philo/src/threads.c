@@ -6,50 +6,25 @@
 /*   By: mforstho <mforstho@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/10/19 12:41:25 by mforstho      #+#    #+#                 */
-/*   Updated: 2022/10/28 18:00:13 by mforstho      ########   odam.nl         */
+/*   Updated: 2022/10/31 15:06:31 by mforstho      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
-void	lock_forks(t_philo *philo, pthread_mutex_t *one, pthread_mutex_t *two)
-{
-	pthread_mutex_lock(one);
-	print_message(philo, "has taken a fork");
-	pthread_mutex_lock(two);
-	print_message(philo, "has taken a fork");
-}
-
-void	unlock_forks(pthread_mutex_t *one, pthread_mutex_t *two)
-{
-	pthread_mutex_unlock(two);
-	pthread_mutex_unlock(one);
-}
-
-bool	philo_think(t_philo *philo)
+void	philo_think(t_philo *philo)
 {
 	if (philo->data->n_philos % 2 == 0)
-	{
-		if (print_message(philo, "is thinking") == false)
-			return (false);
-	}
+		print_message(philo, "is thinking");
 	else
-	{
-		if (print_msg_sleep(philo, "is thinking", (philo->data->t_to_eat / 2)
-				== false))
-			return (false);
-	}
-	return (true);
+		print_msg_sleep(philo, "is thinking", (philo->data->t_to_eat / 2));
 }
 
-size_t	gettime2(void)
+void	gettime_lock(t_philo *philo)
 {
-	struct timeval	tval;
-	size_t			out;
-
-	gettimeofday(&tval, NULL);
-	out = (tval.tv_sec * 1000) + (tval.tv_usec / 1000);
-	return (out);
+	pthread_mutex_lock(&philo->data->deathcheck);
+	gettime(&philo->t_meal);
+	pthread_mutex_unlock(&philo->data->deathcheck);
 }
 
 void	philofunc(t_philo *philo, pthread_mutex_t *one, pthread_mutex_t *two)
@@ -58,18 +33,14 @@ void	philofunc(t_philo *philo, pthread_mutex_t *one, pthread_mutex_t *two)
 		usleep_death(philo, (philo->data->t_to_eat / 2));
 	while (true)
 	{
-		if (is_alive(philo->data) == false)
-			break ;
 		lock_forks(philo, one, two);
-		pthread_mutex_lock(&philo->data->eat_lock);
-		philo->t_meal = gettime2();
-		pthread_mutex_unlock(&philo->data->eat_lock);
-		if (print_msg_sleep(philo, "is eating", philo->data->t_to_eat) == false)
-		{
-			unlock_forks(one, two);
-			break ;
-		}
+		if (is_alive(philo->data) != true)
+			return (unlock_forks(one, two));
+		gettime_lock(philo);
+		print_msg_sleep(philo, "is eating", philo->data->t_to_eat);
 		unlock_forks(one, two);
+		if (is_alive(philo->data) != true)
+			break ;
 		philo->eaten++;
 		if (philo->data->meals != -1 && philo->eaten == philo->data->meals)
 		{
@@ -77,9 +48,10 @@ void	philofunc(t_philo *philo, pthread_mutex_t *one, pthread_mutex_t *two)
 			philo->data->philos_done++;
 			pthread_mutex_unlock(&philo->data->meal_lock);
 		}
-		if (print_msg_sleep(philo, "is sleeping", philo->data->t_to_sleep)
-			== false || philo_think(philo) == false)
+		print_msg_sleep(philo, "is sleeping", philo->data->t_to_sleep);
+		if (is_alive(philo->data) != true)
 			break ;
+		philo_think(philo);
 	}
 }
 
@@ -104,7 +76,7 @@ void	*philo_thread(void *my_philo)
 		pthread_mutex_unlock(&philo->data->deathcheck);
 	}
 	if (philo->data->n_philos == 1)
-		return (one_philo(philo->data));
+		return (one_philo(philo));
 	else if (philo->philo_nbr % 2 == 0)
 		philofunc(philo, philo->fork_left, philo->fork_right);
 	else

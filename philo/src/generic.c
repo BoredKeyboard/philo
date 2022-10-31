@@ -6,7 +6,7 @@
 /*   By: mforstho <mforstho@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/10/19 12:47:19 by mforstho      #+#    #+#                 */
-/*   Updated: 2022/10/28 17:15:37 by mforstho      ########   odam.nl         */
+/*   Updated: 2022/10/31 13:33:14 by mforstho      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,29 +43,6 @@ bool	is_alive(t_data *data)
 	return (ans);
 }
 
-bool	usleep_death(t_philo *philo, int sleep)
-{
-	size_t	begin;
-	size_t	current;
-
-	begin = gettime2();
-	current = gettime2();
-	while (current - begin < (size_t)sleep)
-	{
-		pthread_mutex_lock(&philo->data->deathcheck);
-		if (philo->data->alive != true)
-		{
-			pthread_mutex_unlock(&philo->data->deathcheck);
-			return (false);
-		}
-		pthread_mutex_unlock(&philo->data->deathcheck);
-		usleep(500);
-		current = gettime2();
-	}
-	return (true);
-}
-
-/*
 void	usleep_death(t_philo *philo, int sleep)
 {
 	size_t	begin;
@@ -86,7 +63,6 @@ void	usleep_death(t_philo *philo, int sleep)
 		gettime(&current);
 	}
 }
-*/
 
 int	end_all(t_data *data, t_philo *philo)
 {
@@ -94,7 +70,37 @@ int	end_all(t_data *data, t_philo *philo)
 	pthread_mutex_destroy(&data->deathcheck);
 	pthread_mutex_destroy(&data->printflock);
 	pthread_mutex_destroy(&data->meal_lock);
-	pthread_mutex_destroy(&data->eat_lock);
 	destroy_forks(data, data->n_philos);
 	return (EXIT_SUCCESS);
 }
+
+/*
+void	usleep_death(t_philo *philo, int sleep)
+{
+	size_t	begin;
+	size_t	current;
+
+	gettime(&begin);
+	gettime(&current);
+	while (current - begin < (size_t)sleep)
+	{
+		pthread_mutex_lock(&philo->data->deathcheck);
+		if (philo->data->alive != true)
+		{
+			pthread_mutex_unlock(&philo->data->deathcheck);
+			break ;
+		}
+		if ((current - philo->t_meal)
+			>= (size_t)philo->data->t_to_die)
+		{
+			philo->data->alive = false;
+			pthread_mutex_unlock(&philo->data->deathcheck);
+			print_message_unchecked(philo, "died");
+			break ;
+		}
+		pthread_mutex_unlock(&philo->data->deathcheck);
+		usleep(500);
+		gettime(&current);
+	}
+}
+*/
