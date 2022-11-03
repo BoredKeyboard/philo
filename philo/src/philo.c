@@ -6,7 +6,7 @@
 /*   By: mforstho <mforstho@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/10/10 11:35:49 by mforstho      #+#    #+#                 */
-/*   Updated: 2022/10/31 13:33:04 by mforstho      ########   odam.nl         */
+/*   Updated: 2022/11/03 17:29:50 by mforstho      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,14 @@ int	return_with_msg(char *msg, int fd, int value)
 {
 	ft_putendl_fd(msg, fd);
 	return (value);
+}
+
+void	gettime(size_t *dst)
+{
+	struct timeval	tval;
+
+	gettimeofday(&tval, NULL);
+	*dst = (tval.tv_sec * 1000) + (tval.tv_usec / 1000);
 }
 
 void	*one_philo(t_philo *philo)
@@ -57,8 +65,9 @@ int	main(int argc, char *argv[])
 		free(data.forks);
 		return (return_with_msg("Error: malloc", STDERR_FILENO, EXIT_SUCCESS));
 	}
-	if (initialize_all(&data, philo) != true
-		|| philos_setup(&data, philo) != true)
+	if (initialize_all(&data, philo) != true)
+		return (end_all2(&data, philo));
+	if (philos_setup(&data, philo) != true)
 		return (end_all(&data, philo));
 	return (end_all(&data, philo));
 }

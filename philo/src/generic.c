@@ -6,7 +6,7 @@
 /*   By: mforstho <mforstho@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/10/19 12:47:19 by mforstho      #+#    #+#                 */
-/*   Updated: 2022/10/31 13:33:14 by mforstho      ########   odam.nl         */
+/*   Updated: 2022/11/03 17:29:33 by mforstho      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,14 +23,6 @@ void	destroy_forks(t_data *data, int amount)
 		i++;
 	}
 	free(data->forks);
-}
-
-void	gettime(size_t *dst)
-{
-	struct timeval	tval;
-
-	gettimeofday(&tval, NULL);
-	*dst = (tval.tv_sec * 1000) + (tval.tv_usec / 1000);
 }
 
 bool	is_alive(t_data *data)
@@ -74,33 +66,9 @@ int	end_all(t_data *data, t_philo *philo)
 	return (EXIT_SUCCESS);
 }
 
-/*
-void	usleep_death(t_philo *philo, int sleep)
+int	end_all2(t_data *data, t_philo *philo)
 {
-	size_t	begin;
-	size_t	current;
-
-	gettime(&begin);
-	gettime(&current);
-	while (current - begin < (size_t)sleep)
-	{
-		pthread_mutex_lock(&philo->data->deathcheck);
-		if (philo->data->alive != true)
-		{
-			pthread_mutex_unlock(&philo->data->deathcheck);
-			break ;
-		}
-		if ((current - philo->t_meal)
-			>= (size_t)philo->data->t_to_die)
-		{
-			philo->data->alive = false;
-			pthread_mutex_unlock(&philo->data->deathcheck);
-			print_message_unchecked(philo, "died");
-			break ;
-		}
-		pthread_mutex_unlock(&philo->data->deathcheck);
-		usleep(500);
-		gettime(&current);
-	}
+	free(philo);
+	destroy_forks(data, data->n_philos);
+	return (EXIT_SUCCESS);
 }
-*/

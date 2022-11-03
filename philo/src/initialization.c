@@ -6,7 +6,7 @@
 /*   By: mforstho <mforstho@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/10/18 13:48:02 by mforstho      #+#    #+#                 */
-/*   Updated: 2022/10/31 13:33:08 by mforstho      ########   odam.nl         */
+/*   Updated: 2022/11/03 17:29:28 by mforstho      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -98,8 +98,15 @@ bool	initialize_all(t_data *data, t_philo *philo)
 	if (pthread_mutex_init(&data->printflock, NULL) != SYS_OK)
 		return (false);
 	if (pthread_mutex_init(&data->deathcheck, NULL) != SYS_OK)
+	{
+		pthread_mutex_destroy(&data->printflock);
 		return (false);
+	}
 	if (pthread_mutex_init(&data->meal_lock, NULL) != SYS_OK)
+	{
+		pthread_mutex_destroy(&data->printflock);
+		pthread_mutex_destroy(&data->deathcheck);
 		return (false);
+	}
 	return (true);
 }
