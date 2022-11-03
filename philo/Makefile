@@ -6,13 +6,13 @@
 #    By: mforstho <mforstho@student.codam.nl>         +#+                      #
 #                                                    +#+                       #
 #    Created: 2022/10/10 11:12:37 by mforstho      #+#    #+#                  #
-#    Updated: 2022/10/31 15:04:54 by mforstho      ########   odam.nl          #
+#    Updated: 2022/11/02 14:55:21 by mforstho      ########   odam.nl          #
 #                                                                              #
 # **************************************************************************** #
 
 NAME := philo
 CC := gcc
-CFLAGS ?= -Wextra -Wall -Werror # -O3 # -g -fsanitize=address
+CFLAGS ?= -Wextra -Wall -Werror # -g -fsanitize=address
 
 SOURCES :=				\
 	src/create_philos.c	\

@@ -6,7 +6,7 @@
 /*   By: mforstho <mforstho@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/10/26 15:02:37 by mforstho      #+#    #+#                 */
-/*   Updated: 2022/10/31 14:38:44 by mforstho      ########   odam.nl         */
+/*   Updated: 2022/11/02 14:56:33 by mforstho      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,6 +51,7 @@ void	check_state(t_data *data, t_philo *philo)
 		pthread_mutex_unlock(&data->meal_lock);
 		if (check_death_state(data, philo) == false)
 			return ;
+		usleep(500);
 	}
 	return ;
 }
