@@ -6,7 +6,7 @@
 /*   By: mforstho <mforstho@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/10/10 11:35:49 by mforstho      #+#    #+#                 */
-/*   Updated: 2022/11/03 17:29:50 by mforstho      ########   odam.nl         */
+/*   Updated: 2022/11/08 18:06:13 by mforstho      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,12 +61,14 @@ int	main(int argc, char *argv[])
 	philo = malloc(sizeof(t_philo) * data.n_philos);
 	if (philo == NULL)
 	{
-		free(philo);
 		free(data.forks);
 		return (return_with_msg("Error: malloc", STDERR_FILENO, EXIT_SUCCESS));
 	}
 	if (initialize_all(&data, philo) != true)
-		return (end_all2(&data, philo));
+	{
+		free(philo);
+		return (EXIT_SUCCESS);
+	}
 	if (philos_setup(&data, philo) != true)
 		return (end_all(&data, philo));
 	return (end_all(&data, philo));

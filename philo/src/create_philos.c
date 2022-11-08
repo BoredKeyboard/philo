@@ -6,7 +6,7 @@
 /*   By: mforstho <mforstho@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/10/26 15:02:37 by mforstho      #+#    #+#                 */
-/*   Updated: 2022/11/03 12:56:22 by mforstho      ########   odam.nl         */
+/*   Updated: 2022/11/08 18:12:47 by mforstho      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,10 +67,14 @@ bool	create_philos(t_data *data, t_philo *philo)
 		if (pthread_create(&philo[i].id, NULL, philo_thread, &philo[i])
 			!= SYS_OK)
 		{
-			data->n_philos = i;
 			pthread_mutex_lock(&data->deathcheck);
 			data->alive = false;
 			pthread_mutex_unlock(&data->deathcheck);
+			while (i > 0)
+			{
+				i--;
+				pthread_join(philo[i].id, NULL);
+			}
 			return (false);
 		}
 		i++;

@@ -6,7 +6,7 @@
 /*   By: mforstho <mforstho@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/10/19 12:47:19 by mforstho      #+#    #+#                 */
-/*   Updated: 2022/11/03 17:29:33 by mforstho      ########   odam.nl         */
+/*   Updated: 2022/11/08 18:06:23 by mforstho      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,13 +62,6 @@ int	end_all(t_data *data, t_philo *philo)
 	pthread_mutex_destroy(&data->deathcheck);
 	pthread_mutex_destroy(&data->printflock);
 	pthread_mutex_destroy(&data->meal_lock);
-	destroy_forks(data, data->n_philos);
-	return (EXIT_SUCCESS);
-}
-
-int	end_all2(t_data *data, t_philo *philo)
-{
-	free(philo);
 	destroy_forks(data, data->n_philos);
 	return (EXIT_SUCCESS);
 }

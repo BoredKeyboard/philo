@@ -6,7 +6,7 @@
 /*   By: mforstho <mforstho@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/10/10 11:14:53 by mforstho      #+#    #+#                 */
-/*   Updated: 2022/11/03 17:27:59 by mforstho      ########   odam.nl         */
+/*   Updated: 2022/11/08 18:06:29 by mforstho      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,7 +71,6 @@ void	gettime(size_t *dst);
 bool	is_alive(t_data *data);
 void	usleep_death(t_philo *philo, int sleep);
 int		end_all(t_data *data, t_philo *philo);
-int		end_all2(t_data *data, t_philo *philo);
 
 void	print_message(t_philo *philo, const char *msg);
 void	print_message_unchecked(t_philo *philo, const char *msg);

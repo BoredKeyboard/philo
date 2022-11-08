@@ -6,7 +6,7 @@
 /*   By: mforstho <mforstho@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/10/18 13:48:02 by mforstho      #+#    #+#                 */
-/*   Updated: 2022/11/03 17:29:28 by mforstho      ########   odam.nl         */
+/*   Updated: 2022/11/08 18:15:07 by mforstho      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@ bool	init_arguments(t_data *data, int argc, char *argv[])
 	if (argc == 6)
 	{
 		if (ft_atoi(argv[5], &data->meals) == false
-			|| data->meals < 0)
+			|| data->meals <= 0)
 			return (false);
 	}
 	else
@@ -96,14 +96,19 @@ bool	initialize_all(t_data *data, t_philo *philo)
 	if (init_forks(data, philo) != true)
 		return (false);
 	if (pthread_mutex_init(&data->printflock, NULL) != SYS_OK)
+	{
+		destroy_forks(data, data->n_philos);
 		return (false);
+	}
 	if (pthread_mutex_init(&data->deathcheck, NULL) != SYS_OK)
 	{
+		destroy_forks(data, data->n_philos);
 		pthread_mutex_destroy(&data->printflock);
 		return (false);
 	}
 	if (pthread_mutex_init(&data->meal_lock, NULL) != SYS_OK)
 	{
+		destroy_forks(data, data->n_philos);
 		pthread_mutex_destroy(&data->printflock);
 		pthread_mutex_destroy(&data->deathcheck);
 		return (false);
